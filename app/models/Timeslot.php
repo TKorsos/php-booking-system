@@ -1,0 +1,79 @@
+<?php
+
+declare(strict_types=1);
+
+class Timeslot
+{
+    public int $id;
+    public int $workerId;
+    public string $slotDatetime;
+    public bool $isBooked;
+
+    public function __construct(int $id, int $workerId, string $slotDatetime, bool $isBooked)
+    {
+        $this->id = $id;
+        $this->workerId = $workerId;
+        $this->slotDatetime = $slotDatetime;
+        $this->isBooked = $isBooked;
+    }
+
+    public static function findById(int $id): ?Timeslot
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("SELECT * FROM timeslots WHERE id = :id LIMIT 1");
+        $stmt->execute(['id' => $id]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if(!$row) {
+            return null;
+        }
+
+        return new Timeslot(
+            (int)$row['id'],
+            (int)$row['worker_id'],
+            $row['slot_datetime'],
+            (bool)$row['is_booked']
+        );
+    }
+
+    public static function getByDate(string $date, int $workerId): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("SELECT * FROM timeslots WHERE DATE(slot_datetime) = :date AND worker_id = :workerId ORDER BY slot_datetime ASC");
+
+        $stmt->execute([
+            'date' => $date,
+            'workerId' => $workerId
+        ]);
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $slots = [];
+
+        foreach($rows as $row) {
+            $slots[] = new Timeslot(
+                (int)$row['id'],
+                (int)$row['worker_id'],
+                $row['slot_datetime'],
+                (bool)$row['is_booked']
+            );
+        }
+
+        return $slots;
+    }
+
+    public static function create(int $workerId, string $slotDatetime): bool
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("INSERT INTO timeslots (worker_id, slot_datetime, is_booked) VALUES (:workerId, :slotDatetime, 0)");
+
+        return $stmt->execute([
+            'workerId' => $workerId,
+            'slotDatetime' => $slotDatetime
+        ]);
+    }
+}
