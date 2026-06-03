@@ -56,4 +56,18 @@ class AdminController extends Controller
             'title' => 'Admin Dashboard'
         ]);
     }
+
+    public function bookings(): void
+    {
+        $this->requireLogin();
+
+        $bookingModel = new Booking();
+        $bookings = $bookingModel->getAllWithTimeslots();
+
+        $this->view('admin/bookings', [
+            'title' => 'Foglalások listája',
+            'bookings' => $bookings
+        ]);
+    }
+
 }
