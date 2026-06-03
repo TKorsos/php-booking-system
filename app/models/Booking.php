@@ -38,4 +38,24 @@ class Booking
 
         return $booking ?: null;
     }
+
+    public function getAllWithTimeslots(): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("
+            SELECT 
+                bookings.id,
+                bookings.customer_name,
+                bookings.customer_email,
+                timeslots.slot_datetime
+            FROM bookings
+            INNER JOIN timeslots ON bookings.timeslot_id = timeslots.id
+            ORDER BY timeslots.slot_datetime ASC
+        ");
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
