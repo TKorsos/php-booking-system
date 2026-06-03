@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Időpontok - <?= htmlspecialchars($date) ?></title>
     <style>
+        /* Szervezd ki external css fájlba! */
         body {
             font-family: Arial, sans-serif;
             background: #f5f5f5;
