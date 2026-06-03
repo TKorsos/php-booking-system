@@ -37,12 +37,21 @@
             border-left-color: #dc3545;
             opacity: 0.6;
         }
-        .flash.success {
-            background: #d4edda;
-            color: #155724;
+        .flash {
             padding: 10px;
             border-radius: 4px;
             margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .flash.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .flash.error {
+            background: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
@@ -50,6 +59,12 @@
 
 <?php if ($msg = Flash::get('success')): ?>
     <div class="flash success">
+        <?= htmlspecialchars($msg) ?>
+    </div>
+<?php endif; ?>
+
+<?php if ($msg = Flash::get('error')): ?>
+    <div class="flash error">
         <?= htmlspecialchars($msg) ?>
     </div>
 <?php endif; ?>
