@@ -58,4 +58,12 @@ class Booking
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function delete(int $id): bool
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("DELETE FROM bookings WHERE id = :id");
+        return $stmt->execute(['id' => $id]);
+    }
+
 }

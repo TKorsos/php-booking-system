@@ -70,4 +70,29 @@ class AdminController extends Controller
         ]);
     }
 
+    public function deleteBooking(): void
+    {
+        $this->requireLogin();
+
+        $id = $_GET['id'] ?? null;
+
+        if (!$id) {
+            Flash::set('error', 'Hiányzó foglalás ID.');
+            header('Location: ?c=admin&m=bookings');
+            exit;
+        }
+
+        $bookingModel = new Booking();
+
+        if ($bookingModel->delete((int)$id)) {
+            Flash::set('success', 'Foglalás törölve.');
+        } else {
+            Flash::set('error', 'A törlés nem sikerült.');
+        }
+
+        header('Location: ?c=admin&m=bookings');
+        exit;
+    }
+
+
 }
