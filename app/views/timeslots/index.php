@@ -37,9 +37,22 @@
             border-left-color: #dc3545;
             opacity: 0.6;
         }
+        .flash.success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
+
+<?php if ($msg = Flash::get('success')): ?>
+    <div class="flash success">
+        <?= htmlspecialchars($msg) ?>
+    </div>
+<?php endif; ?>
 
 <h1>
     Időpontok - <?= htmlspecialchars($date) ?>

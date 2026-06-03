@@ -51,6 +51,8 @@ class BookingController extends Controller
         $stmt = $db->prepare("UPDATE timeslots SET is_booked = 1 WHERE id = :id");
         $stmt->execute(['id' => $slot->id]);
 
-        echo "Foglalás sikeres!";
+        Flash::set('success', 'Foglalás sikeresen rögzítve!');
+        header('Location: ?c=timeslot&m=index&date='. date('Y-m-d'));
+        exit;
     }
 }
