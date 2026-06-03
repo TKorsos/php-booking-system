@@ -42,7 +42,7 @@
 <body>
 
 <h1>
-    Időpontok – <?= htmlspecialchars($date) ?>
+    Időpontok - <?= htmlspecialchars($date) ?>
     (<?= date('l', strtotime($date)) ?>)
 </h1>
 
@@ -57,7 +57,12 @@
     <?php foreach ($slots as $slot): ?>
         <div class="slot <?= $slot->isBooked ? 'booked' : '' ?>">
             <strong><?= date('H:i', strtotime($slot->slotDatetime)) ?></strong>
-            <span><?= $slot->isBooked ? 'Foglalt' : 'Szabad' ?></span>
+
+            <?php if (!$slot->isBooked): ?>
+                <a href="?c=booking&m=form&id=<?= $slot->id ?>">Foglalás</a>
+            <?php else: ?>
+                <span>Foglalt</span>
+            <?php endif; ?>
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
