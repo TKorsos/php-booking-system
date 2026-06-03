@@ -16,8 +16,9 @@ class BookingController extends Controller
         $slot = Timeslot::findById((int)$id);
 
         if (!$slot || $slot->isBooked) {
-            echo "Ez az időpont nem foglalható.";
-            return;
+            Flash::set('error', 'Ez az időpont nem foglalható.');
+            header('Location: ?c=timeslot&m=index&date=' . date('Y-m-d'));
+            exit;
         }
 
         $this->view('booking/form', [
@@ -32,19 +33,37 @@ class BookingController extends Controller
         $email = trim($_POST['email'] ?? '');
 
         if (!$id || $name === '' || $email === '') {
-            echo "Minden mező kötelező.";
-            return;
+            Flash::set('error', 'Minden mező kötelező.');
+            header('Location: ?c=timeslot&m=index&date=' . date('Y-m-d'));
+            exit;
         }
 
         $slot = Timeslot::findById((int)$id);
 
         if (!$slot || $slot->isBooked) {
-            echo "Ez az időpont már nem foglalható.";
-            return;
+            Flash::set('error', 'Ez az időpont nem foglalható.');
+            header('Location: ?c=timeslot&m=index&date=' . date('Y-m-d'));
+            exit;
+        }
+
+        // Dupla foglalás ellenőrzése
+        if (Booking::findByTimeslot($slot->id)) {
+            Flash::set('error', 'Ez az időpont már foglalt.');
+            header('Location: ?c=timeslot&m=index&date=' . date('Y-m-d'));
+            exit;
         }
 
         // Foglalás mentése
-        Booking::create($slot->id, $name, $email);
+        try {
+            Booking::create($slot->id, $name, $email);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') { // UNIQUE constraint violation
+                Flash::set('error', 'Ez az időpont időközben foglalttá vált.');
+                header('Location: ?c=timeslot&m=index&date=' . date('Y-m-d'));
+                exit;
+            }
+            throw $e;
+        }
 
         // Timeslot frissítése
         $db = Database::getConnection();
