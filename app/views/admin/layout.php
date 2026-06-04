@@ -18,6 +18,7 @@
                 <li class="nav-item"><a class="nav-link" href="?c=admin&m=dashboard">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" href="?c=admin&m=bookings">Foglalások</a></li>
                 <li class="nav-item"><a class="nav-link" href="?c=admin&m=timeslots">Időpontok</a></li>
+                <li class="nav-item"><a class="nav-link" href="?c=admin&m=generateTimeslots">Időpont generálás</a></li>
             </ul>
 
             <ul class="navbar-nav">

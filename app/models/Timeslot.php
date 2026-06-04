@@ -7,11 +7,12 @@ class Timeslot
     public function getAll(): array
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT * from timeslots ORDER BY slot_datetime ASC");
+        $stmt = $db->prepare("SELECT * FROM timeslots ORDER BY slot_datetime ASC");
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function findById(int $id): ?Timeslot
+    public static function findById(int $id): ?array
     {
         $db = Database::getConnection();
 
@@ -20,16 +21,16 @@ class Timeslot
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if(!$row) {
+        if (!$row) {
             return null;
         }
 
-        return new Timeslot(
-            (int)$row['id'],
-            (int)$row['worker_id'],
-            $row['slot_datetime'],
-            (bool)$row['is_booked']
-        );
+        return [
+            'id' => (int)$row['id'],
+            'worker_id' => (int)$row['worker_id'],
+            'slot_datetime' => $row['slot_datetime'],
+            'is_booked' => (bool)$row['is_booked']
+        ];
     }
 
     public static function getByDate(string $date, int $workerId): array
@@ -64,17 +65,18 @@ class Timeslot
         return $slots;
     }
 
-
     public static function create(int $workerId, string $slotDatetime): bool
     {
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("INSERT INTO timeslots (worker_id, slot_datetime, is_booked) VALUES (:workerId, :slotDatetime, 0)");
+        $stmt = $db->prepare("
+            INSERT INTO timeslots (worker_id, slot_datetime, is_booked) 
+            VALUES (:workerId, :slotDatetime, 0)
+        ");
 
         return $stmt->execute([
             'workerId' => $workerId,
             'slotDatetime' => $slotDatetime
         ]);
     }
-
 }
