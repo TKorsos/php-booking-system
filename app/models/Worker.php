@@ -77,4 +77,19 @@ class Worker
 
         return $workers;
     }
+
+    public static function getAllWithTimeslots(): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->query("
+            SELECT DISTINCT w.*
+            FROM workers w
+            JOIN timeslots t ON t.worker_id = w.id
+            ORDER BY w.name ASC
+        ");
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
 }
