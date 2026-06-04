@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 class Timeslot
 {
-    public int $id;
-    public int $workerId;
-    public string $slotDatetime;
-    public bool $isBooked;
-
-    public function __construct(int $id, int $workerId, string $slotDatetime, bool $isBooked)
+    public function getAll(): array
     {
-        $this->id = $id;
-        $this->workerId = $workerId;
-        $this->slotDatetime = $slotDatetime;
-        $this->isBooked = $isBooked;
+        $db = Database::getConnection();
+        $stmt = $db->prepare("SELECT * from timeslots ORDER BY slot_datetime ASC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function findById(int $id): ?Timeslot
@@ -42,7 +36,12 @@ class Timeslot
     {
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT * FROM timeslots WHERE DATE(slot_datetime) = :date AND worker_id = :workerId ORDER BY slot_datetime ASC");
+        $stmt = $db->prepare("
+            SELECT * FROM timeslots 
+            WHERE DATE(slot_datetime) = :date 
+            AND worker_id = :workerId 
+            ORDER BY slot_datetime ASC
+        ");
 
         $stmt->execute([
             'date' => $date,
@@ -53,17 +52,18 @@ class Timeslot
 
         $slots = [];
 
-        foreach($rows as $row) {
-            $slots[] = new Timeslot(
-                (int)$row['id'],
-                (int)$row['worker_id'],
-                $row['slot_datetime'],
-                (bool)$row['is_booked']
-            );
+        foreach ($rows as $row) {
+            $slots[] = [
+                'id' => (int)$row['id'],
+                'worker_id' => (int)$row['worker_id'],
+                'slot_datetime' => $row['slot_datetime'],
+                'is_booked' => (bool)$row['is_booked']
+            ];
         }
 
         return $slots;
     }
+
 
     public static function create(int $workerId, string $slotDatetime): bool
     {
@@ -76,4 +76,5 @@ class Timeslot
             'slotDatetime' => $slotDatetime
         ]);
     }
+
 }
