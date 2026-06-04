@@ -107,4 +107,59 @@ class AdminController extends Controller
         ]);
     }
 
+    public function generateTimeslots(): void
+    {
+        $this->requireLogin();
+
+        $this->view('admin/generate_timeslots', [
+            'title' => 'Időpontok generálása'
+        ]);
+    }
+
+    public function generateTimeslotsSubmit(): void
+    {
+        $this->requireLogin();
+
+        $start = $_POST['start_date'] ?? null;
+        $end = $_POST['end_date'] ?? null;
+        $workerId = 1; // később több dolgozó is lehet
+
+        if (!$start || !$end) {
+            Flash::set('error', 'Minden mező kitöltése kötelező.');
+            header('Location: ?c=admin&m=generateTimeslots');
+            exit;
+        }
+
+        // Dátum validáció
+        if (strtotime($start) === false || strtotime($end) === false) {
+            Flash::set('error', 'Érvénytelen dátum formátum.');
+            header('Location: ?c=admin&m=generateTimeslots');
+            exit;
+        }
+
+        if ($start > $end) {
+            Flash::set('error', 'A kezdő dátum nem lehet később, mint a vég dátum.');
+            header('Location: ?c=admin&m=generateTimeslots');
+            exit;
+        }
+
+        // Worker betöltése
+        $worker = Worker::findById($workerId);
+
+        if (!$worker) {
+            Flash::set('error', 'A dolgozó nem található.');
+            header('Location: ?c=admin&m=generateTimeslots');
+            exit;
+        }
+
+        // Generálás
+        $generator = new TimeslotGenerator($worker);
+        $generator->generateForRange($start, $end);
+
+        Flash::set('success', 'Időpontok sikeresen generálva.');
+        header('Location: ?c=admin&m=timeslots');
+        exit;
+    }
+
+
 }
