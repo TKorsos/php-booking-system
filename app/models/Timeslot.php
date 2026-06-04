@@ -7,7 +7,14 @@ class Timeslot
     public function getAll(): array
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT * FROM timeslots ORDER BY slot_datetime ASC");
+
+        $stmt = $db->prepare("
+            SELECT t.*, w.name AS worker_name
+            FROM timeslots t
+            JOIN workers w ON w.id = t.worker_id
+            ORDER BY t.slot_datetime ASC
+        ");
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -63,6 +70,23 @@ class Timeslot
         }
 
         return $slots;
+    }
+
+    public static function getByWorker(int $workerId): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("
+            SELECT t.*, w.name AS worker_name
+            FROM timeslots t
+            JOIN workers w ON w.id = t.worker_id
+            WHERE t.worker_id = :workerId
+            ORDER BY t.slot_datetime ASC
+        ");
+
+        $stmt->execute(['workerId' => $workerId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function create(int $workerId, string $slotDatetime): bool

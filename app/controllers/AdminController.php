@@ -98,12 +98,25 @@ class AdminController extends Controller
     {
         $this->requireLogin();
 
-        $model = new Timeslot();
-        $timeslots = $model->getAll();
+        $workerId = $_GET['worker'] ?? null;
+
+        if ($workerId) {
+            // Szűrés dolgozó szerint
+            $timeslots = Timeslot::getByWorker((int)$workerId);
+        } else {
+            // Minden időpont
+            $model = new Timeslot();
+            $timeslots = $model->getAll();
+        }
+
+        // Dolgozók listája a legördülőhöz
+        $workers = Worker::getAllWithTimeslots();
 
         $this->view('admin/timeslots', [
-            'title' => 'Időpontok',
-            'timeslots' => $timeslots
+            'title' => 'Időpontok listája',
+            'timeslots' => $timeslots,
+            'workers' => $workers,
+            'selectedWorker' => $workerId
         ]);
     }
 
