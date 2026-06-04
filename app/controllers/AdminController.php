@@ -94,5 +94,17 @@ class AdminController extends Controller
         exit;
     }
 
+    public function timeslots(): void
+    {
+        $this->requireLogin();
+
+        $model = new Timeslot();
+        $timeslots = $model->getAll();
+
+        $this->view('admin/timeslots', [
+            'title' => 'Időpontok',
+            'timeslots' => $timeslots
+        ]);
+    }
 
 }

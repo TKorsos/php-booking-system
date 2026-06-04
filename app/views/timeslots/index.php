@@ -83,11 +83,11 @@
     <p>Nincs időpont erre a napra.</p>
 <?php else: ?>
     <?php foreach ($slots as $slot): ?>
-        <div class="slot <?= $slot->isBooked ? 'booked' : '' ?>">
-            <strong><?= date('H:i', strtotime($slot->slotDatetime)) ?></strong>
+        <div class="slot <?= $slot['is_booked'] ? 'booked' : '' ?>">
+            <strong><?= date('H:i', strtotime($slot['slot_datetime'])) ?></strong>
 
-            <?php if (!$slot->isBooked): ?>
-                <a href="?c=booking&m=form&id=<?= $slot->id ?>">Foglalás</a>
+            <?php if (!$slot['is_booked']): ?>
+                <a href="?c=booking&m=form&id=<?= $slot['id'] ?>">Foglalás</a>
             <?php else: ?>
                 <span>Foglalt</span>
             <?php endif; ?>
