@@ -64,7 +64,7 @@
 
                         <td><?= date('Y-m-d H:i', strtotime($t['slot_datetime'])) ?></td>
 
-                        <!-- státusz előkészítve -->
+                        <!-- státusz -->
                         <td>
                             <?php if ($t['is_booked']): ?>
                                 <span class="badge bg-danger">Foglalt</span>
@@ -73,12 +73,19 @@
                             <?php endif; ?>
                         </td>
 
-
-                        <!-- törlés gomb előkészítve, egyelőre disabled -->
+                        <!-- törlés gomb -->
                         <td>
-                            <button class="btn btn-sm btn-danger" disabled>
-                                Törlés
-                            </button>
+                            <?php if (!$t['is_booked']): ?>
+                                <a href="?c=admin&m=deleteTimeslot&id=<?= $t['id'] ?>"
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('Biztosan törlöd ezt az időpontot?');">
+                                    Törlés
+                                </a>
+                            <?php else: ?>
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    Nem törölhető
+                                </button>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

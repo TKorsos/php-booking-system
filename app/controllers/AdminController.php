@@ -120,6 +120,39 @@ class AdminController extends Controller
         ]);
     }
 
+    public function deleteTimeslot(): void
+    {
+        $this->requireLogin();
+
+        $id = $_GET['id'] ?? null;
+
+        if (!$id) {
+            Flash::set('error', 'Hiányzó ID.');
+            header('Location: ?c=admin&m=timeslots');
+            exit;
+        }
+
+        $timeslot = Timeslot::findById((int)$id);
+
+        if (!$timeslot) {
+            Flash::set('error', 'A megadott időpont nem létezik.');
+            header('Location: ?c=admin&m=timeslots');
+            exit;
+        }
+
+        if ($timeslot['is_booked']) {
+            Flash::set('error', 'Foglalt időpont nem törölhető.');
+            header('Location: ?c=admin&m=timeslots');
+            exit;
+        }
+
+        Timeslot::delete((int)$id);
+
+        Flash::set('success', 'Időpont sikeresen törölve.');
+        header('Location: ?c=admin&m=timeslots');
+        exit;
+    }
+
     public function generateTimeslots(): void
     {
         $this->requireLogin();

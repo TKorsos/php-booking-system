@@ -103,4 +103,13 @@ class Timeslot
             'slotDatetime' => $slotDatetime
         ]);
     }
+
+    public static function delete(int $id): bool
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("DELETE FROM timeslots WHERE id = :id");
+        return $stmt->execute(['id' => $id]);
+    }
+
 }
