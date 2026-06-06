@@ -91,5 +91,4 @@ class Worker
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
 }

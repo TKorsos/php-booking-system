@@ -83,13 +83,21 @@ class AdminController extends Controller
         }
 
         $bookingModel = new Booking();
+        $booking = $bookingModel->findById((int)$id);
 
-        if ($bookingModel->delete((int)$id)) {
-            Flash::set('success', 'Foglalás törölve.');
-        } else {
-            Flash::set('error', 'A törlés nem sikerült.');
+        if (!$booking) {
+            Flash::set('error', 'A foglalás nem található.');
+            header('Location: ?c=admin&m=bookings');
+            exit;
         }
 
+        // 1) Foglalás törlése
+        $bookingModel->delete((int)$id);
+
+        // 2) Időpont felszabadítása
+        Timeslot::markAsFree((int)$booking['timeslot_id']);
+
+        Flash::set('success', 'Foglalás törölve és időpont felszabadítva.');
         header('Location: ?c=admin&m=bookings');
         exit;
     }
@@ -206,6 +214,5 @@ class AdminController extends Controller
         header('Location: ?c=admin&m=timeslots');
         exit;
     }
-
 
 }
