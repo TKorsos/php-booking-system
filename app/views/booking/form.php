@@ -2,20 +2,18 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Foglalás - <?= date('H:i', strtotime($slot->slotDatetime)) ?></title>
+    <title>Foglalás - <?= date('H:i', strtotime($slot['slot_datetime'])) ?></title>
 </head>
 <body>
 
-<!-- Formázás szebb stílusra - external css -->
 <h1>Foglalás</h1>
 
 <p>
-    Időpont: <strong><?= date('Y-m-d H:i', strtotime($slot->slotDatetime)) ?></strong>
+    Időpont: <strong><?= date('Y-m-d H:i', strtotime($slot['slot_datetime'])) ?></strong>
 </p>
 
 <form action="?c=booking&m=submit" method="POST">
-    <!-- CSRF token -->
-    <input type="hidden" name="id" value="<?= $slot->id ?>">
+    <input type="hidden" name="id" value="<?= $slot['id'] ?>">
 
     <label>Név:</label><br>
     <input type="text" name="name" required><br><br>
@@ -28,3 +26,4 @@
 
 </body>
 </html>
+

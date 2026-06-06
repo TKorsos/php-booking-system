@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 class Timeslot
 {
+
+    public function __construct()
+    {
+        
+    }
+
     public function getAll(): array
     {
         $db = Database::getConnection();
@@ -28,16 +34,7 @@ class Timeslot
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$row) {
-            return null;
-        }
-
-        return [
-            'id' => (int)$row['id'],
-            'worker_id' => (int)$row['worker_id'],
-            'slot_datetime' => $row['slot_datetime'],
-            'is_booked' => (bool)$row['is_booked']
-        ];
+        return $row ?: null;
     }
 
     public static function getByDate(string $date, int $workerId): array
@@ -56,20 +53,21 @@ class Timeslot
             'workerId' => $workerId
         ]);
 
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-        $slots = [];
 
-        foreach ($rows as $row) {
-            $slots[] = [
-                'id' => (int)$row['id'],
-                'worker_id' => (int)$row['worker_id'],
-                'slot_datetime' => $row['slot_datetime'],
-                'is_booked' => (bool)$row['is_booked']
-            ];
-        }
+    public static function markAsFree(int $id): bool
+    {
+        $db = Database::getConnection();
 
-        return $slots;
+        $stmt = $db->prepare("
+            UPDATE timeslots 
+            SET is_booked = 0 
+            WHERE id = :id
+        ");
+
+        return $stmt->execute(['id' => $id]);
     }
 
     public static function getByWorker(int $workerId): array
@@ -93,10 +91,7 @@ class Timeslot
     {
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("
-            INSERT INTO timeslots (worker_id, slot_datetime, is_booked) 
-            VALUES (:workerId, :slotDatetime, 0)
-        ");
+        $stmt = $db->prepare("INSERT INTO timeslots (worker_id, slot_datetime, is_booked) VALUES (:workerId, :slotDatetime, 0)");
 
         return $stmt->execute([
             'workerId' => $workerId,
@@ -111,5 +106,4 @@ class Timeslot
         $stmt = $db->prepare("DELETE FROM timeslots WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }
-
 }

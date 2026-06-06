@@ -10,20 +10,16 @@ class Booking
     public string $customer_email;
     public string $created_at;
 
-    public static function create(int $timeslotId, string $name, string $email): bool
+    public static function findById(int $id): ?array
     {
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("
-            INSERT INTO bookings (timeslot_id, customer_name, customer_email) 
-            VALUES (:timeslot_id, :name, :email)
-        ");
+        $stmt = $db->prepare("SELECT * FROM bookings WHERE id = :id LIMIT 1");
+        $stmt->execute(['id' => $id]);
 
-        return $stmt->execute([
-            'timeslot_id' => $timeslotId,
-            'name' => $name,
-            'email' => $email
-        ]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
     }
 
     public static function findByTimeslot(int $timeslotId): ?Booking
@@ -56,6 +52,22 @@ class Booking
 
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function create(int $timeslotId, string $name, string $email): bool
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("
+            INSERT INTO bookings (timeslot_id, customer_name, customer_email) 
+            VALUES (:timeslot_id, :name, :email)
+        ");
+
+        return $stmt->execute([
+            'timeslot_id' => $timeslotId,
+            'name' => $name,
+            'email' => $email
+        ]);
     }
 
     public function delete(int $id): bool
