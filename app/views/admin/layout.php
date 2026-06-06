@@ -10,15 +10,21 @@
 
 <?php if (!empty($_SESSION['admin_logged_in'])): ?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
+    <div class="container">
         <a class="navbar-brand" href="?c=admin&m=dashboard">Admin Panel</a>
 
-        <div class="collapse navbar-collapse">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="adminNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="?c=admin&m=dashboard">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" href="?c=admin&m=bookings">Foglalások</a></li>
                 <li class="nav-item"><a class="nav-link" href="?c=admin&m=timeslots">Időpontok</a></li>
                 <li class="nav-item"><a class="nav-link" href="?c=admin&m=generateTimeslots">Időpont generálás</a></li>
+                <li class="nav-item"><a class="nav-link" href="?c=admin&m=workerHours">Munkaidő</a></li>
+                <li class="nav-item"><a class="nav-link" href="?c=admin&m=workers">Dolgozók</a></li>
             </ul>
 
             <ul class="navbar-nav">
@@ -27,6 +33,7 @@
         </div>
     </div>
 </nav>
+
 <?php endif; ?>
 
 <div class="container mt-3">
