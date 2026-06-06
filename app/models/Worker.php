@@ -2,32 +2,17 @@
 
 declare(strict_types=1);
 
-class Worker 
+class Worker
 {
     public int $id;
     public string $name;
-    public string $workStart;
-    public string $workEnd;
-    public ?string $saturdayStart;
-    public ?string $saturdayEnd;
-    public bool $isSundayClosed;
+    public string $email;
 
-    public function __construct(
-        int $id,
-        string $name,
-        string $workStart,
-        string $workEnd,
-        ?string $saturdayStart,
-        ?string $saturdayEnd,
-        bool $isSundayClosed
-    ) {
+    public function __construct(int $id, string $name, string $email)
+    {
         $this->id = $id;
         $this->name = $name;
-        $this->workStart = $workStart;
-        $this->workEnd = $workEnd;
-        $this->saturdayStart = $saturdayStart;
-        $this->saturdayEnd = $saturdayEnd;
-        $this->isSundayClosed = $isSundayClosed;
+        $this->email = $email;
     }
 
     public static function findById(int $id): ?Worker
@@ -46,11 +31,7 @@ class Worker
         return new Worker(
             (int)$row['id'],
             $row['name'],
-            $row['work_start'],
-            $row['work_end'],
-            $row['saturday_start'],
-            $row['saturday_end'],
-            (bool)$row['is_sunday_closed']
+            $row['email']
         );
     }
 
@@ -58,7 +39,7 @@ class Worker
     {
         $db = Database::getConnection();
 
-        $stmt = $db->query("SELECT * FROM workers ORDER BY id ASC");
+        $stmt = $db->query("SELECT * FROM workers ORDER BY name ASC");
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $workers = [];
@@ -67,11 +48,7 @@ class Worker
             $workers[] = new Worker(
                 (int)$row['id'],
                 $row['name'],
-                $row['work_start'],
-                $row['work_end'],
-                $row['saturday_start'],
-                $row['saturday_end'],
-                (bool)$row['is_sunday_closed']
+                $row['email']
             );
         }
 
@@ -83,12 +60,24 @@ class Worker
         $db = Database::getConnection();
 
         $stmt = $db->query("
-            SELECT DISTINCT w.*
+            SELECT w.*
             FROM workers w
-            JOIN timeslots t ON t.worker_id = w.id
             ORDER BY w.name ASC
         ");
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $workers = [];
+
+        foreach ($rows as $row) {
+            $workers[] = new Worker(
+                (int)$row['id'],
+                $row['name'],
+                $row['email']
+            );
+        }
+
+        return $workers;
     }
+
 }

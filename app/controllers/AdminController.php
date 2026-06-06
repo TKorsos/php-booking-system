@@ -215,4 +215,75 @@ class AdminController extends Controller
         exit;
     }
 
+    public function workers(): void
+    {
+        $this->requireLogin();
+
+        $workers = Worker::getAll(); // egyszerű lekérés
+
+        $this->view('admin/workers', [
+            'title' => 'Dolgozók listája',
+            'workers' => $workers
+        ]);
+    }
+
+    public function workerHours(): void
+    {
+        $this->requireLogin();
+
+        $workerId = (int)($_GET['workerId'] ?? 1);
+
+        // Lekérjük a dolgozó heti munkaidejét
+        $hours = WorkerHours::getByWorker($workerId);
+
+        // Napok nevei (0 = hétfő)
+        $days = [
+            0 => 'Hétfő',
+            1 => 'Kedd',
+            2 => 'Szerda',
+            3 => 'Csütörtök',
+            4 => 'Péntek',
+            5 => 'Szombat',
+            6 => 'Vasárnap'
+        ];
+
+        $this->view('admin/worker_hours', [
+            'workerId' => $workerId,
+            'hours' => $hours,
+            'days' => $days
+        ]);
+    }
+
+    public function saveWorkerHours(): void
+    {
+        $this->requireLogin();
+
+        $workerId = (int)($_GET['workerId'] ?? 1);
+
+        foreach ($_POST['day'] as $day => $data) {
+
+            $isOff = isset($data['off']);
+            $start = $data['start'] ?? null;
+            $end   = $data['end'] ?? null;
+
+            if ($isOff || empty($start) || empty($end)) {
+                // OFF nap → töröljük
+                WorkerHours::deleteDay($workerId, (int)$day);
+                continue;
+            }
+
+            // Mentés (insert vagy update)
+            WorkerHours::save(
+                $workerId,
+                (int)$day,
+                $start,
+                $end
+            );
+        }
+
+        Flash::set('success', 'Munkaidő sikeresen frissítve.');
+        header('Location: ?c=admin&m=workerHours&workerId=' . $workerId);
+        exit;
+    }
+
 }

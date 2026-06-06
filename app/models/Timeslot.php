@@ -17,7 +17,7 @@ class Timeslot
         $stmt = $db->prepare("
             SELECT t.*, w.name AS worker_name
             FROM timeslots t
-            JOIN workers w ON w.id = t.worker_id
+            LEFT JOIN workers w ON w.id = t.worker_id
             ORDER BY t.slot_datetime ASC
         ");
 

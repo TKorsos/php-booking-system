@@ -15,7 +15,6 @@ class BookingController extends Controller
 
         $slot = Timeslot::findById((int)$id);
 
-        // TÖMB → helyes elérés: $slot['is_booked']
         if (!$slot || $slot['is_booked']) {
             Flash::set('error', 'Ez az időpont nem foglalható.');
             header('Location: ?c=timeslot&m=index&date=' . date('Y-m-d'));
@@ -41,7 +40,6 @@ class BookingController extends Controller
 
         $slot = Timeslot::findById((int)$id);
 
-        // TÖMB → helyes elérés
         if (!$slot || $slot['is_booked']) {
             Flash::set('error', 'Ez az időpont nem foglalható.');
             header('Location: ?c=timeslot&m=index&date=' . date('Y-m-d'));
